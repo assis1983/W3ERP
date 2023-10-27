@@ -1,12 +1,89 @@
-import Router from './config/router'
-import GlobalStyles from '@/assets/styles/global-styles'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useContext } from 'react'
+import { GlobalStyle } from './assets/GlobalStyle'
+import { Wrapper } from './components/Generation/styles'
+import { Dashboard } from './pages/Dashboard'
+import { Login } from './pages/Login'
+import { Predicoes } from './pages/Predicoes'
+import { Produtos } from './pages/Produtos'
+import { Layout } from './components/Layout'
+import { ProdutoDetalhes } from './pages/ProdutoDetalhes'
+import { ClienteDetalhes } from './pages/ClienteDetalhes'
+import { AuthContext, AuthProvider } from './contexts/AuthContext'
+import { PredicaoClienteDetalhes } from './pages/PredicaoClienteDetalhes'
+
+export function PrivateRoutesAccess({
+  children
+}: {
+  children: React.ReactNode
+}) {
+  const { authentified } = useContext(AuthContext)
+  if (!authentified) {
+    return <Navigate to="/login" />
+  }
+  return <Layout>{children}</Layout>
+}
 
 function App() {
   return (
-    <>
-      <GlobalStyles />
-      <Router />
-    </>
+    <Wrapper>
+      <GlobalStyle />
+      <BrowserRouter>
+        <AuthProvider>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <PrivateRoutesAccess>
+                  <Dashboard />
+                </PrivateRoutesAccess>
+              }
+            />
+            <Route
+              path="/predicoes"
+              element={
+                <PrivateRoutesAccess>
+                  <Predicoes />
+                </PrivateRoutesAccess>
+              }
+            />
+            <Route
+              path="/produtos"
+              element={
+                <PrivateRoutesAccess>
+                  <Produtos />
+                </PrivateRoutesAccess>
+              }
+            />
+            <Route
+              path="/produto/:id"
+              element={
+                <PrivateRoutesAccess>
+                  <ProdutoDetalhes />
+                </PrivateRoutesAccess>
+              }
+            />
+            <Route
+              path="/cliente/:id"
+              element={
+                <PrivateRoutesAccess>
+                  <ClienteDetalhes />
+                </PrivateRoutesAccess>
+              }
+            />
+            <Route
+              path="/predicao/:id"
+              element={
+                <PrivateRoutesAccess>
+                  <PredicaoClienteDetalhes />
+                </PrivateRoutesAccess>
+              }
+            />
+          </Routes>
+        </AuthProvider>
+      </BrowserRouter>
+    </Wrapper>
   )
 }
 
